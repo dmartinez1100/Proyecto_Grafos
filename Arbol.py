@@ -2,8 +2,8 @@ from tkinter import *
 import time
 import math
 root = Tk()
-Width = 2460
-Heigh = 1520
+Width = 1080
+Heigh = 920
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 
@@ -11,6 +11,10 @@ canvas.pack()
 def Nodo(Nombre,x,y,size):
     canvas.create_oval(x-(size/2),y,x+(size/2),y+size)
     canvas.create_window(x,y+(size/2),anchor = CENTER,window = Label(root,text = Nombre))
+    root.update()
+def Arista(Nombre,x1,y1,x2,y2):
+    canvas.create_line(x1,y1,x2,y2)
+    canvas.create_window(x2+((x1-x2)/2),y2+((y1-y2)/2),anchor = CENTER,window = Label(root,text = Nombre,bg = "white",fg="red"))
     root.update()
 def Arbol(altura,hijos):
     contador = 0
@@ -23,16 +27,14 @@ def Arbol(altura,hijos):
         for j in range(0,hijos**i):
             Nodo(str(contador),espaciado_ancho*(2*j+1),espaciado_alto*(i+1),Node_size)
             if i != 0 and i!= altura:
-                canvas.create_line(espaciado_ancho*(2*j+1),espaciado_alto*(i+1),espaciado_anterior*(2*contador_2+1),espaciado_alto*(i)+Node_size)
+                Arista("e"+str(contador),espaciado_ancho*(2*j+1),espaciado_alto*(i+1),espaciado_anterior*(2*contador_2+1),espaciado_alto*(i)+Node_size)
             if contador % hijos == 0:
                 contador_2 +=1
             contador+=1
-            print(contador_2)
 
-
-        canvas.pack()
+Arbol(3,5)
 boton = Button(root,text = "Circulo",command = lambda:Arbol(5,2))
 botond = canvas.create_window(0,10,anchor = NW,window = boton)
 
 root.mainloop()
-print("holaaaa")
+
