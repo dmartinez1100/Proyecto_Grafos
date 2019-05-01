@@ -3,7 +3,7 @@ import time
 import math
 root = Tk()
 Width = 1420
-Heigh = 1080
+Heigh = 800
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 
@@ -22,6 +22,7 @@ def Arbol(num,altura,hijos,nodos,aristas):
     espaciado_alto = Heigh/(2*altura)
     Node_size = (Width/hijos**altura)
     posiciones = []
+    posiciones_aristas = []
     for i in range(0,altura):
         espaciado_ancho = Width/(2*(hijos**i))
         espaciado_anterior = Width/(2*(hijos**(i-1)))
@@ -29,20 +30,32 @@ def Arbol(num,altura,hijos,nodos,aristas):
         for j in range(0,hijos**i):
             posiciones.append([espaciado_ancho*(2*j+1),espaciado_alto*(i+1)])
             if i != 0 and i!= altura:
-                Arista("e"+str(contador),espaciado_ancho*(2*j+1),espaciado_alto*(i+1),espaciado_anterior*(2*contador_2+1),espaciado_alto*(i)+Node_size)
+                posiciones_aristas.append([espaciado_ancho*(2*j+1),espaciado_alto*(i+1),espaciado_anterior*(2*contador_2+1),espaciado_alto*(i)+Node_size])
             if contador % hijos == 0:
                 contador_2 +=1
             contador+=1
-    pos = 0
-    nombre = num
-    for i in range(hijos**(altura-1)-1):
-        Nodo(nombre,posiciones[pos][0],posiciones[pos][1],Node_size)
-        for j in range(hijos):
-            Nodo(nodos[nombre][j],posiciones[(hijos*i)+j+1][0],posiciones[hijos*i+j+1][1],Node_size)
-        pos+=1    
-        nombre-=1
 
-init = 56
+    nodos_totales = 0
+    Nodo(num,posiciones[0][0],posiciones[0][1],Node_size)
+    aux = nodos[num]
+    padres = [num]
+    print(aux)
+    for k in range(altura-2):
+        nodos_totales+= hijos**(k+1)
+
+    for i in range(nodos_totales+1):
+
+        for j in range(len(nodos[aux[0]])):
+            Nodo(aux[0],posiciones[hijos*i+j+1][0],posiciones[hijos*i+j+1][1],Node_size)
+            for d in nodos[aux[0]]:
+                aux.append(d)
+            padres.append(aux[0])
+            Arista(aristas[(padres[0],aux[0])],posiciones_aristas[hijos*i+j][0],posiciones_aristas[hijos*i+j][1],posiciones_aristas[hijos*i+j][2],posiciones_aristas[hijos*i+j][3])
+            print((padres[0],aux[0]),aristas[(padres[0],aux[0])])
+            aux.pop(0)
+        padres.pop(0)
+
+init = 15
 max = 3
 last_num = max + 2
 lista_ganar = []
@@ -59,7 +72,6 @@ for a in arbol:
     for b in arbol[a]:
         arbol_valores[(a,b)] = 1 if b in lista_ganar else 0
 
-print(arbol)
-boton = Button(root,text = "Circulo",command = lambda:Arbol(56,3,3,arbol,arbol_valores))
-botond = canvas.create_window(0,10,anchor = NW,window = boton)
+Arbol(init,5,max,arbol,arbol_valores)
+print(arbol_valores)
 root.mainloop()
