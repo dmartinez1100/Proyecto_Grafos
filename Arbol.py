@@ -39,7 +39,6 @@ def Arbol(num,altura,hijos,nodos,aristas):
     Nodo(num,posiciones[0][0],posiciones[0][1],Node_size)
     aux = nodos[num]
     padres = [num]
-    print(aux)
     for k in range(altura-2):
         nodos_totales+= hijos**(k+1)
 
@@ -51,18 +50,17 @@ def Arbol(num,altura,hijos,nodos,aristas):
                 aux.append(d)
             padres.append(aux[0])
             Arista(aristas[(padres[0],aux[0])],posiciones_aristas[hijos*i+j][0],posiciones_aristas[hijos*i+j][1],posiciones_aristas[hijos*i+j][2],posiciones_aristas[hijos*i+j][3])
-            print((padres[0],aux[0]),aristas[(padres[0],aux[0])])
             aux.pop(0)
         padres.pop(0)
 
-init = 15
+init = 13
 max = 3
 last_num = max + 2
 lista_ganar = []
 while last_num < init:
     lista_ganar.append(last_num)
     last_num += max+1
-
+lista_ganar.append(1)
 arbol = {}
 for i in range(1,init+1):
     arbol[i] = [i-a for a in range(1,max+1) if i-a >= 0]
@@ -73,5 +71,4 @@ for a in arbol:
         arbol_valores[(a,b)] = 1 if b in lista_ganar else 0
 
 Arbol(init,5,max,arbol,arbol_valores)
-print(arbol_valores)
 root.mainloop()
