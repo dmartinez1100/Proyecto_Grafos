@@ -43,17 +43,19 @@ def Arbol(num,altura,hijos,nodos,aristas):
         nodos_totales+= hijos**(k+1)
 
     for i in range(nodos_totales+1):
-
         for j in range(len(nodos[aux[0]])):
-            Nodo(aux[0],posiciones[hijos*i+j+1][0],posiciones[hijos*i+j+1][1],Node_size)
+            padres.append(aux[0])
+            if aux[0] !=0:
+                Nodo(aux[0],posiciones[hijos*i+j+1][0],posiciones[hijos*i+j+1][1],Node_size)
+                Arista(aristas[(padres[0],aux[0])],posiciones_aristas[hijos*i+j][0],posiciones_aristas[hijos*i+j][1],posiciones_aristas[hijos*i+j][2],posiciones_aristas[hijos*i+j][3])
             for d in nodos[aux[0]]:
                 aux.append(d)
-            padres.append(aux[0])
-            Arista(aristas[(padres[0],aux[0])],posiciones_aristas[hijos*i+j][0],posiciones_aristas[hijos*i+j][1],posiciones_aristas[hijos*i+j][2],posiciones_aristas[hijos*i+j][3])
             aux.pop(0)
         padres.pop(0)
+        if len(padres)==0:
+            break
 
-init = 13
+init = 5
 max = 3
 last_num = max + 2
 lista_ganar = []
@@ -62,13 +64,16 @@ while last_num < init:
     last_num += max+1
 lista_ganar.append(1)
 arbol = {}
-for i in range(1,init+1):
+for i in range(0,init+1):
     arbol[i] = [i-a for a in range(1,max+1) if i-a >= 0]
+    while len(arbol[i]) < max:
+        arbol[i].append(0)
 
 arbol_valores = {}
 for a in arbol:
     for b in arbol[a]:
         arbol_valores[(a,b)] = 1 if b in lista_ganar else 0
 
-Arbol(init,5,max,arbol,arbol_valores)
+print(arbol)
+Arbol(init,4,max,arbol,arbol_valores)
 root.mainloop()
