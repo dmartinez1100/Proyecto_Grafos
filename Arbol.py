@@ -18,6 +18,7 @@ def Arista(Nombre,x1,y1,x2,y2):
     root.update()
 
 def Arbol(num,altura,num_hijos,nodos,aristas):
+    canvas.delete('all')
     contador = 0
     espaciado_alto = Heigh/(2*altura)
     Node_size = (Width/num_hijos**altura)
@@ -88,7 +89,13 @@ while monedas > 1:
     print("Ahora quedan",str(monedas),"monedas")
     Arbol(monedas,3,max,arbol,arbol_valores)
     if jugador:
-        eleccion = int(input("Cuantas monedas desea retirar?: "))
+        eleccion = 0
+        while True:
+            eleccion = int(input("Cuantas monedas desea retirar?: "))
+            max_eleccion = min(monedas,max)
+            if eleccion > max_eleccion or eleccion < 1:
+                print('Solo puede retirar un numero de monedas entre 1 y',str(max_eleccion))
+            else: break
         monedas -= eleccion
     else:
         eleccion = monedas-1
