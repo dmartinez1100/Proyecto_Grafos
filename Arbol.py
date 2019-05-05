@@ -7,21 +7,30 @@ Heigh = 800
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 
-numero = IntVar()
-numero2 = IntVar()
-
+def escribir(t):
+    canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = t,font = ('Arial','50'))
 def inicio():
-    global numero,numero2
+    numero = IntVar()
+    numero2 = IntVar()
+    jugador = StringVar()
+    jugador.set("Escoge Quien Inicia Jugando")
     canvas.delete("all")
+
     canvas.create_text(Width/2,Heigh/6,anchor = CENTER, text = "Welcome to Nim Game",font = ('Arial','50'))
     canvas.create_text(Width/2,Heigh/2-50,anchor = CENTER, text = "Max Coins",font = ('Arial','50'))
+    canvas.create_text(Width/2,2*Heigh/3-50,anchor = CENTER, text = "Coins Jump",font = ('Arial','50'))
+
     e1 = Entry(root,textvariable = numero,width = 100)
     canvas.create_window(Width/2,Heigh/2,anchor = CENTER,window = e1)
-    canvas.create_text(Width/2,2*Heigh/3-50,anchor = CENTER, text = "Coins Jump",font = ('Arial','50'))
     e2 = Entry(root,textvariable = numero2,width = 100)
     canvas.create_window(Width/2,2*Heigh/3,anchor = CENTER,window = e2)
-    boton = Button(root,text = "Start",width = 75,command = lambda: juego(int(e1.get()),int(e2.get())))
+
+    menu = OptionMenu(root,jugador,"Jugador","CPU")
+    canvas.create_window(Width/2,5*Heigh/6-50,window = menu)
+
+    boton = Button(root,text = "Start",width = 75,command = lambda: juego(int(e1.get()),int(e2.get()),jugador.get()))
     canvas.create_window(Width/2,5*Heigh/6,window = boton)
+
 def Nodo(Nombre,x,y,size):
     canvas.create_oval(x-(size/2),y,x+(size/2),y+size)
     canvas.create_window(x,y+(size/2),anchor = CENTER,window = Label(root,text = Nombre))
@@ -72,7 +81,7 @@ def Arbol(num,altura,num_hijos,nodos,aristas):
         padres.pop(0)
         if len(padres)==0:
             break
-def juego(monedas,max):
+def juego(monedas,max,jug):
     last_num = max + 2
     lista_ganar = []
     while last_num < monedas:
@@ -90,15 +99,9 @@ def juego(monedas,max):
         for b in arbol[a]:
             arbol_valores[(a,b)] = 1 if b in lista_ganar else 0
     del lista_ganar[-1]
-    while True:
-        Arbol(monedas,3,max,arbol,arbol_valores)
-        canvas.create_text(Width/2,35,anchor = CENTER,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','35'))
-        jugador = input("Ingrese 1 si desea comenzar la partida. Ingrese 0 en caso contrario: ")
-        if jugador == '1' or jugador == '0':
-            jugador = bool(int(jugador))
-            break
-        else:
-            print("Por favor ingrese 1 si desea comenzar la partida, o 0 si no desea comenzar la partida.")
+
+    if jug[0] == 'C': jugador = 0
+    else: jugador = 1
 
     while monedas > 1:
         print("Ahora quedan",str(monedas),"monedas")
