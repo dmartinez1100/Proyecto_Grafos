@@ -134,7 +134,7 @@ def juego(monedas,max,jug):
             time.sleep(2)
             monedas = eleccion
         jugador = not jugador
-
+    Arbol(monedas,3,max,arbol,arbol_valores)
     if jugador: escribir('Queda solamente una moneda. Usted ha perdido.')
     else: escribir('Queda solamente una moneda. Usted ha ganado.')
 inicio()
