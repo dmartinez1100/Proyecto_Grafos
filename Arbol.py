@@ -1,6 +1,9 @@
 from tkinter import *
+from tkinter import simpledialog
 import math
 import random
+import time
+
 root = Tk()
 Width = 1420
 Heigh = 800
@@ -8,7 +11,10 @@ canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 
 def escribir(t):
-    canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = t,font = ('Arial','50'))
+    size = '50'
+    if len(t) >= 30: size = '25'
+    canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = t,font = ('Arial',size))
+    root.update()
 def inicio():
     numero = IntVar()
     numero2 = IntVar()
@@ -104,18 +110,18 @@ def juego(monedas,max,jug):
     else: jugador = 1
 
     while monedas > 1:
-        print("Ahora quedan",str(monedas),"monedas")
         Arbol(monedas,3,max,arbol,arbol_valores)
         if monedas < lista_ganar[-1]: del lista_ganar[-1]
-        canvas.create_text(Width/2,35,anchor = CENTER,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','35'))
+        canvas.create_text(0,0,anchor = NW,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','20'))
+        canvas.create_text(0,50,anchor = NW,text = "Monedas Restantes: "+str(monedas),font = ('Arial','20'))
         root.update()
         if jugador:
             eleccion = 0
             while True:
-                eleccion = int(input("Cuantas monedas desea retirar?: "))
+                eleccion = simpledialog.askinteger("Pregunta","Cuantas monedas desea retirar?: ",parent = root)
                 max_eleccion = min(monedas,max)
                 if eleccion > max_eleccion or eleccion < 1:
-                    print('Solo puede retirar un numero de monedas entre 1 y',str(max_eleccion))
+                    escribir('Solo puede retirar un numero de monedas entre 1 y'+str(max_eleccion))
                 else: break
             monedas -= eleccion
         else:
@@ -124,12 +130,12 @@ def juego(monedas,max,jug):
                 if arbol_valores[(monedas,hijo)] == 1:
                     eleccion = hijo
                     break
-            print("Voy a retirar",str(monedas-eleccion),"monedas")
+            escribir("Voy a retirar: "+str(monedas-eleccion)+" monedas")
+            time.sleep(2)
             monedas = eleccion
         jugador = not jugador
 
-    if jugador: print('Queda solamente una moneda. Usted ha perdido.')
-    else: print('Queda solamente una moneda. Usted ha ganado.')
-
+    if jugador: escribir('Queda solamente una moneda. Usted ha perdido.')
+    else: escribir('Queda solamente una moneda. Usted ha ganado.')
 inicio()
 root.mainloop()
