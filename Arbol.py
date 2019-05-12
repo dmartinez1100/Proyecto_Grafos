@@ -6,7 +6,7 @@ import time
 
 root = Tk()
 Width = 1024
-Heigh = 960
+Heigh = 720
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 palabras = canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = '',font = ('Arial','0'))
@@ -151,9 +151,6 @@ def juego(monedas,max,jug):
         canvas.create_text(0,100,anchor = NW,text = "Puedes tomar: "+str(max),font = ('Arial','20'))
         if jugador and monedas == 1: escribir('Queda solamente una moneda. Usted ha perdido.')
         elif monedas ==1 : escribir('Queda solamente una moneda. Usted ha ganado.')
-        else:
-            if jugador == 0: ganador = "CPU"
-            else : ganador = "El jugador"
-            escribir("Han quedado %r monedas, %s gano" %(monedas,ganador))
+        else: escribir("Usted ha retirado la ultima moneda. Usted ha perdido.")
 inicio()
 root.mainloop()
