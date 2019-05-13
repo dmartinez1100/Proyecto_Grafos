@@ -5,8 +5,8 @@ import random
 import time
 
 root = Tk()
-Width = 1024
-Heigh = 720
+Width = 800
+Heigh = 600
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 palabras = canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = '',font = ('Arial','0'))
@@ -14,14 +14,14 @@ def escribir(t):
     global palabras
     canvas.delete(palabras)
     size = '50'
-    if len(t) >= 30: size = '30'
+    if len(t) >= 30: size = '25'
     palabras = canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = t,font = ('Arial',size))
     root.update()
 def inicio():
     numero = IntVar()
     numero2 = IntVar()
     jugador = StringVar()
-    jugador.set("Escoge Quien Inicia Jugando")
+    jugador.set("Modo de Juego")
     canvas.delete("all")
 
     canvas.create_text(Width/2,Heigh/6,anchor = CENTER, text = "Welcome to Nim Game",font = ('Arial','50'))
@@ -33,7 +33,7 @@ def inicio():
     e2 = Entry(root,textvariable = numero2,width = int(Width/10))
     canvas.create_window(Width/2,2*Heigh/3,anchor = CENTER,window = e2)
 
-    menu = OptionMenu(root,jugador,"Jugador","CPU")
+    menu = OptionMenu(root,jugador,"Jugador vs CPU","CPU vs Jugador","Multijugador")
     canvas.create_window(Width/2,5*Heigh/6-50,window = menu)
 
     boton = Button(root,text = "Start",width = int(Width/100),command = lambda: juego(int(e1.get()),int(e2.get()),jugador.get()))
@@ -53,7 +53,7 @@ def Arbol(num,altura,num_hijos,nodos,aristas):
     canvas.delete('all')
     contador = 0
     espaciado_alto = Heigh/(2*altura)
-    Node_size = (Width/num_hijos**altura)
+    Node_size = min(Width/num_hijos**altura,Heigh/altura)
     posiciones = []
     posiciones_aristas = []
     for i in range(0,altura):
@@ -135,22 +135,46 @@ def juego(monedas,max,jug):
             if not salir: break
             monedas -= eleccion
         else:
-            eleccion = monedas-random.randint(1,max)
-            for hijo in arbol[monedas]:
-                if arbol_valores[(monedas,hijo)] == 1:
-                    eleccion = hijo
-                    break
-            escribir("Voy a retirar: "+str(monedas-eleccion)+" monedas")
-            time.sleep(2)
-            monedas = eleccion
+            if jug[0] == 'C' or jug[0] == 'J':
+                eleccion = monedas-random.randint(1,max)
+                for hijo in arbol[monedas]:
+                    if arbol_valores[(monedas,hijo)] == 1:
+                        eleccion = hijo
+                        break
+                escribir("Voy a retirar: "+str(monedas-eleccion)+" monedas")
+                time.sleep(2)
+                monedas = eleccion
+            else:
+                eleccion = 0
+                while True:
+                    eleccion = simpledialog.askinteger("Pregunta","jug 2 Cuantas monedas desea retirar?: ",parent = root)
+                    if eleccion == None:
+                        inicio()
+                        salir = False
+                        break
+                    max_eleccion = min(monedas,max)
+                    if eleccion > max_eleccion or eleccion < 1:
+                        escribir('Solo puede retirar un numero de monedas entre 1 y'+str(max_eleccion))
+                    else: break
+                if not salir: break
+                monedas -= eleccion
         jugador = not jugador
     if salir:
         Arbol(monedas,3,max,arbol,arbol_valores)
         canvas.create_text(0,0,anchor = NW,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','20'))
         canvas.create_text(0,50,anchor = NW,text = "Monedas Restantes: "+str(monedas),font = ('Arial','20'))
         canvas.create_text(0,100,anchor = NW,text = "Puedes tomar: "+str(max),font = ('Arial','20'))
-        if jugador and monedas == 1: escribir('Queda solamente una moneda. Usted ha perdido.')
-        elif monedas ==1 : escribir('Queda solamente una moneda. Usted ha ganado.')
-        else: escribir("Usted ha retirado la ultima moneda. Usted ha perdido.")
+
+        if jugador : ganador = "El jugador 2"
+        else: ganador = "El jugador 1"
+
+        if monedas == 1:
+            if jugador and jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha perdido.')
+            elif jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha ganado.')
+            elif jug[0] == 'M': escribir("Queda solamente una moneda. Ha Ganado " + ganador)
+        else:
+            escribir("No han quedado monedas, %s gano" %(ganador))
+        boton = Button(root,text = "Main Screen",width = 12,command = inicio)
+        canvas.create_window(Width/2,5*Heigh/6,window = boton)
 inicio()
 root.mainloop()
