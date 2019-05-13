@@ -9,11 +9,33 @@ from multiprocessing.pool import ThreadPool
 root = Tk()
 Width = 800
 Heigh = 600
+
+root.geometry('%rx%r+%r+%r'%(Width,Heigh,0,0))
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
+
+root.resizable(0,0)
 palabras = canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = '',font = ('Arial','0'))
 dynamicvar = IntVar()
 intvar = 0
+def posicion_actual():
+    string = root.winfo_geometry()
+    numero = ""
+    lista = []
+
+    for i in range(len(string)):
+        if string[i] == '+':
+            for j in range(i,len(string)):
+                
+                if j+1 != len(string) and string[j+1] != '+':
+                    print(string[j+1])
+                    numero += string[j+1]
+                else:
+                    lista.append(numero)
+                    numero = ""
+                    break
+
+    return (lista[0],lista[1])
 
 def obtener_dato(entry,ventana):
     global intvar
@@ -29,13 +51,14 @@ def obtener_dato(entry,ventana):
 def obtener_entero(sing):
     global dynamicvar
     j = Tk()
-    j.geometry("400x50+%r+%r" %(int(Width/2),int(3*Heigh/4)))
+    print(sing[0],sing[1])
+    j.geometry("400x50+%d+%d" %(0,0))
     entry = Entry(j,width = 50,bd = 1,textvariable = dynamicvar)
     boton = Button(j,text = "Enter",command = lambda : obtener_dato(entry,j))
-    boton_cancel = Button(j,text = "Cancel",command = lambda : obtener_dato(None,j))
+    #boton_cancel = Button(j,text = "Cancel",command = lambda : obtener_dato(None,j))
     entry.grid(row = 1)
     boton.grid(row = 0,column = 0)
-    boton_cancel.grid(row = 0, columns = 1)
+    #boton_cancel.grid(row = 0, columns = 1)
     j.mainloop()
     return intvar
 
@@ -174,7 +197,7 @@ def juego(monedas,max,jug):
             while True:
                 escribir("Turno Jugador 1")
                 pool = ThreadPool(processes = 1)
-                assync_result = pool.apply_async(obtener_entero,("holaaaa",))
+                assync_result = pool.apply_async(obtener_entero,(posicion_actual(),))
                 eleccion = assync_result.get()
 
                 #eleccion = simpledialog.askinteger("Pregunta","Cuantas monedas desea retirar?: ",parent = root)
@@ -204,7 +227,7 @@ def juego(monedas,max,jug):
                 while True:
                     escribir("Turno Jugador 2")
                     pool = ThreadPool(processes = 1)
-                    assync_result = pool.apply_async(obtener_entero,("holaaaa",))
+                    assync_result = pool.apply_async(obtener_entero,(posicion_actual(),))
                     eleccion = assync_result.get() 
 
                     #eleccion = simpledialog.askinteger("Pregunta","jug 2 Cuantas monedas desea retirar?: ",parent = root)
