@@ -1,8 +1,10 @@
 from tkinter import *
 from tkinter import simpledialog
+from tkinter import messagebox
 import math
 import random
 import time
+from multiprocessing.pool import ThreadPool
 
 root = Tk()
 Width = 800
@@ -10,6 +12,43 @@ Heigh = 600
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 palabras = canvas.create_text(Width/2,9*Heigh/10,anchor = CENTER, text = '',font = ('Arial','0'))
+dynamicvar = IntVar()
+intvar = 0
+
+def obtener_dato(entry,ventana):
+    global intvar
+
+    if entry == None:
+        intvar = None
+    else:
+	    try:
+                intvar = int(entry.get())
+	    except ValueError:
+                intvar = -1
+    ventana.destroy()
+def obtener_entero(sing):
+    global dynamicvar
+    j = Tk()
+    j.geometry("400x50+%r+%r" %(int(Width/2),int(3*Heigh/4)))
+    entry = Entry(j,width = 50,bd = 1,textvariable = dynamicvar)
+    boton = Button(j,text = "Enter",command = lambda : obtener_dato(entry,j))
+    boton_cancel = Button(j,text = "Cancel",command = lambda : obtener_dato(None,j))
+    entry.grid(row = 1)
+    boton.grid(row = 0,column = 0)
+    boton_cancel.grid(row = 0, columns = 1)
+    j.mainloop()
+    return intvar
+
+def filtro_texto(e1,e2,jug):
+    try:
+        mon = int(e1.get())
+        ma = int(e2.get())
+    except ValueError:
+        escribir("Debe ingresar un entero")
+        time.sleep(1)
+        inicio()
+        return
+    juego(mon,ma,jug)
 def escribir(t):
     global palabras
     canvas.delete(palabras)
@@ -36,7 +75,7 @@ def inicio():
     menu = OptionMenu(root,jugador,"Jugador vs CPU","CPU vs Jugador","Multijugador")
     canvas.create_window(Width/2,5*Heigh/6-50,window = menu)
 
-    boton = Button(root,text = "Start",width = int(Width/100),command = lambda: juego(int(e1.get()),int(e2.get()),jugador.get()))
+    boton = Button(root,text = "Start",width = int(Width/100),command = lambda: filtro_texto(e1,e2,jugador.get()))
     canvas.create_window(Width/2,5*Heigh/6,window = boton)
 
 def Nodo(Nombre,x,y,size):
@@ -90,6 +129,16 @@ def Arbol(num,altura,num_hijos,nodos,aristas):
         if len(padres)==0:
             break
 def juego(monedas,max,jug):
+    if monedas <= 0:
+        escribir("Debe haber almenos una moneda para retirar")
+        time.sleep(1)
+        inicio()
+        return
+    elif max <= 0:
+        escribir("No es posible retirar 0 monedas o menos")
+        time.sleep(1)
+        inicio()
+        return
     salir = True
     last_num = max + 2
     lista_ganar = []
@@ -123,7 +172,12 @@ def juego(monedas,max,jug):
         if jugador:
             eleccion = 0
             while True:
-                eleccion = simpledialog.askinteger("Pregunta","Cuantas monedas desea retirar?: ",parent = root)
+                escribir("Turno Jugador 1")
+                pool = ThreadPool(processes = 1)
+                assync_result = pool.apply_async(obtener_entero,("holaaaa",))
+                eleccion = assync_result.get()
+
+                #eleccion = simpledialog.askinteger("Pregunta","Cuantas monedas desea retirar?: ",parent = root)
                 if eleccion == None:
                     inicio()
                     salir = False
@@ -131,6 +185,7 @@ def juego(monedas,max,jug):
                 max_eleccion = min(monedas,max)
                 if eleccion > max_eleccion or eleccion < 1:
                     escribir('Solo puede retirar un numero de monedas entre 1 y'+str(max_eleccion))
+                    time.sleep(1)
                 else: break
             if not salir: break
             monedas -= eleccion
@@ -147,7 +202,12 @@ def juego(monedas,max,jug):
             else:
                 eleccion = 0
                 while True:
-                    eleccion = simpledialog.askinteger("Pregunta","jug 2 Cuantas monedas desea retirar?: ",parent = root)
+                    escribir("Turno Jugador 2")
+                    pool = ThreadPool(processes = 1)
+                    assync_result = pool.apply_async(obtener_entero,("holaaaa",))
+                    eleccion = assync_result.get() 
+
+                    #eleccion = simpledialog.askinteger("Pregunta","jug 2 Cuantas monedas desea retirar?: ",parent = root)
                     if eleccion == None:
                         inicio()
                         salir = False
@@ -155,6 +215,7 @@ def juego(monedas,max,jug):
                     max_eleccion = min(monedas,max)
                     if eleccion > max_eleccion or eleccion < 1:
                         escribir('Solo puede retirar un numero de monedas entre 1 y'+str(max_eleccion))
+                        time.sleep(1)
                     else: break
                 if not salir: break
                 monedas -= eleccion
