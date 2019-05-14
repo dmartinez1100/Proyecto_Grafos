@@ -12,6 +12,7 @@ Width = 800
 Heigh = 600
 
 root.geometry('%rx%r+%r+%r'%(Width,Heigh,0,0))
+root.title("Nim Game")
 canvas = Canvas(root,width = Width,heigh = Heigh)
 canvas.pack()
 
@@ -27,9 +28,8 @@ def posicion_actual():
     for i in range(len(string)):
         if string[i] == '+':
             for j in range(i,len(string)):
-                
+
                 if j+1 != len(string) and string[j+1] != '+':
-                    print(string[j+1])
                     numero += string[j+1]
                 else:
                     lista.append(numero)
@@ -52,19 +52,21 @@ def obtener_dato(entry,ventana):
 def obtener_entero(sing):
     global dynamicvar
     j = Tk()
-    print(sing[0],sing[1])
+    frame = Frame(j,bd = 5)
+    frame.pack()
+    j.title("")
+    j.overrideredirect(1)
     j.geometry("400x50+%d+%d" %(int(sing[0])+(Width/4),int(sing[1])+8*Heigh/10))
-    entry = Entry(j,width = 50,bd = 1,textvariable = dynamicvar)
-    boton = Button(j,text = "Enter",command = lambda : obtener_dato(entry,j))
-    #boton_cancel = Button(j,text = "Cancel",command = lambda : obtener_dato(None,j))
-    entry.grid(row = 1)
-    boton.grid(row = 0,column = 0)
-    #boton_cancel.grid(row = 0, columns = 1)
+    entry = Entry(frame,width = 25,bd = 1,textvariable = dynamicvar)
+    boton = Button(frame,text = "Enter",command = lambda : obtener_dato(entry,j),width = 10)
+    boton_cancel = Button(frame,text = "Cancel",command = lambda : obtener_dato(None,j),width = 10)
+    entry.grid(row = 0,column = 0)
+    boton.grid(row = 0,column = 1)
+    boton_cancel.grid(row = 0, column = 2)
     j.mainloop()
     return intvar
 
 def filtro_texto(e1,e2,jug):
-    print(posicion_actual()[0],posicion_actual()[1])
     try:
         mon = int(e1.get())
         ma = int(e2.get())
@@ -158,7 +160,7 @@ def juego(monedas,max,jug):
     jugador2 = "Jugador 2"
     if jug[0] != 'M' and jug[0] != 'B': jugador2 = "CPU"
     elif jug[0] == 'B': jugador1 = "I_A"
-    print(jug[0])
+
     jugador_actual = {1:jugador1,0:jugador2}
     if monedas <= 0:
         escribir("Debe haber almenos una moneda para retirar")
@@ -190,7 +192,7 @@ def juego(monedas,max,jug):
     if len(lista_ganar) > 1:
         del lista_ganar[-1]
 
-    
+
     if jug[0] == 'C': jugador = 0
     else: jugador = 1
 
@@ -223,7 +225,7 @@ def juego(monedas,max,jug):
                 eleccion = I_A.get_move(monedas,max)
                 escribir("I_A retira %r monedas" %(eleccion))
                 time.sleep(1)
-            
+
             if not salir: break
             monedas -= eleccion
         else:
@@ -241,7 +243,7 @@ def juego(monedas,max,jug):
                 while True:
                     pool = ThreadPool(processes = 1)
                     assync_result = pool.apply_async(obtener_entero,(posicion_actual(),))
-                    eleccion = assync_result.get() 
+                    eleccion = assync_result.get()
 
                     #eleccion = simpledialog.askinteger("Pregunta","jug 2 Cuantas monedas desea retirar?: ",parent = root)
                     if eleccion == None:
@@ -266,7 +268,7 @@ def juego(monedas,max,jug):
         else: ganador = jugador1
 
         if monedas == 1:
-            if jugador and jug[0] == 'B' : escribir('Queda solamente una moneda. ha perdido la I_A.') 
+            if jugador and jug[0] == 'B' : escribir('Queda solamente una moneda. ha perdido la I_A.')
             elif jugador and jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha perdido.')
             elif jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha ganado.')
             elif jug[0] == 'M': escribir("Queda solamente una moneda. Ha Ganado " + ganador)
