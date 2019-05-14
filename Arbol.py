@@ -4,6 +4,7 @@ from tkinter import messagebox
 import math
 import random
 import time
+import I_A
 from multiprocessing.pool import ThreadPool
 
 root = Tk()
@@ -52,7 +53,7 @@ def obtener_entero(sing):
     global dynamicvar
     j = Tk()
     print(sing[0],sing[1])
-    j.geometry("400x50+%d+%d" %(0,0))
+    j.geometry("400x50+%d+%d" %(int(sing[0])+(Width/4),int(sing[1])+8*Heigh/10))
     entry = Entry(j,width = 50,bd = 1,textvariable = dynamicvar)
     boton = Button(j,text = "Enter",command = lambda : obtener_dato(entry,j))
     #boton_cancel = Button(j,text = "Cancel",command = lambda : obtener_dato(None,j))
@@ -63,6 +64,7 @@ def obtener_entero(sing):
     return intvar
 
 def filtro_texto(e1,e2,jug):
+    print(posicion_actual()[0],posicion_actual()[1])
     try:
         mon = int(e1.get())
         ma = int(e2.get())
@@ -95,7 +97,7 @@ def inicio():
     e2 = Entry(root,textvariable = numero2,width = int(Width/10))
     canvas.create_window(Width/2,2*Heigh/3,anchor = CENTER,window = e2)
 
-    menu = OptionMenu(root,jugador,"Jugador vs CPU","CPU vs Jugador","Multijugador")
+    menu = OptionMenu(root,jugador,"Jugador vs CPU","CPU vs Jugador","Multijugador","Backtracking vs CPU")
     canvas.create_window(Width/2,5*Heigh/6-50,window = menu)
 
     boton = Button(root,text = "Start",width = int(Width/100),command = lambda: filtro_texto(e1,e2,jugador.get()))
@@ -152,6 +154,12 @@ def Arbol(num,altura,num_hijos,nodos,aristas):
         if len(padres)==0:
             break
 def juego(monedas,max,jug):
+    jugador1 = "Jugador 1"
+    jugador2 = "Jugador 2"
+    if jug[0] != 'M' and jug[0] != 'B': jugador2 = "CPU"
+    elif jug[0] == 'B': jugador1 = "I_A"
+    print(jug[0])
+    jugador_actual = {1:jugador1,0:jugador2}
     if monedas <= 0:
         escribir("Debe haber almenos una moneda para retirar")
         time.sleep(1)
@@ -182,6 +190,7 @@ def juego(monedas,max,jug):
     if len(lista_ganar) > 1:
         del lista_ganar[-1]
 
+    
     if jug[0] == 'C': jugador = 0
     else: jugador = 1
 
@@ -191,16 +200,16 @@ def juego(monedas,max,jug):
         canvas.create_text(0,0,anchor = NW,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','20'))
         canvas.create_text(0,50,anchor = NW,text = "Monedas Restantes: "+str(monedas),font = ('Arial','20'))
         canvas.create_text(0,100,anchor = NW,text = "Puedes tomar: "+str(max),font = ('Arial','20'))
+        canvas.create_text(Width/2,50,anchor = NW,text = "Turno: "+str(jugador_actual[jugador]),font = ('Arial','20'))
         root.update()
         if jugador:
             eleccion = 0
-            while True:
-                escribir("Turno Jugador 1")
+            while True and jug[0] != 'B':
+
                 pool = ThreadPool(processes = 1)
                 assync_result = pool.apply_async(obtener_entero,(posicion_actual(),))
                 eleccion = assync_result.get()
 
-                #eleccion = simpledialog.askinteger("Pregunta","Cuantas monedas desea retirar?: ",parent = root)
                 if eleccion == None:
                     inicio()
                     salir = False
@@ -210,10 +219,15 @@ def juego(monedas,max,jug):
                     escribir('Solo puede retirar un numero de monedas entre 1 y'+str(max_eleccion))
                     time.sleep(1)
                 else: break
+            if jug[0] == 'B':
+                eleccion = I_A.get_move(monedas,max)
+                escribir("I_A retira %r monedas" %(eleccion))
+                time.sleep(1)
+            
             if not salir: break
             monedas -= eleccion
         else:
-            if jug[0] == 'C' or jug[0] == 'J':
+            if jug[0] != 'M':
                 eleccion = monedas-random.randint(1,max)
                 for hijo in arbol[monedas]:
                     if arbol_valores[(monedas,hijo)] == 1:
@@ -225,7 +239,6 @@ def juego(monedas,max,jug):
             else:
                 eleccion = 0
                 while True:
-                    escribir("Turno Jugador 2")
                     pool = ThreadPool(processes = 1)
                     assync_result = pool.apply_async(obtener_entero,(posicion_actual(),))
                     eleccion = assync_result.get() 
@@ -250,10 +263,11 @@ def juego(monedas,max,jug):
         canvas.create_text(0,100,anchor = NW,text = "Puedes tomar: "+str(max),font = ('Arial','20'))
 
         if jugador : ganador = "El jugador 2"
-        else: ganador = "El jugador 1"
+        else: ganador = jugador1
 
         if monedas == 1:
-            if jugador and jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha perdido.')
+            if jugador and jug[0] == 'B' : escribir('Queda solamente una moneda. ha perdido la I_A.') 
+            elif jugador and jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha perdido.')
             elif jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha ganado.')
             elif jug[0] == 'M': escribir("Queda solamente una moneda. Ha Ganado " + ganador)
         else:
