@@ -55,9 +55,9 @@ def obtener_entero(sing):
     frame = Frame(j,bd = 5)
     frame.pack()
     j.title("")
-    j.overrideredirect(1)
+    #j.overrideredirect(1)
     j.geometry("400x50+%d+%d" %(int(sing[0])+(Width/4),int(sing[1])+8*Heigh/10))
-    entry = Entry(frame,width = 25,bd = 1,textvariable = dynamicvar)
+    entry = Entry(frame,width = 20,bd = 1,textvariable = dynamicvar)
     boton = Button(frame,text = "Enter",command = lambda : obtener_dato(entry,j),width = 10)
     boton_cancel = Button(frame,text = "Cancel",command = lambda : obtener_dato(None,j),width = 10)
     entry.grid(row = 0,column = 0)
@@ -158,10 +158,17 @@ def Arbol(num,altura,num_hijos,nodos,aristas):
 def juego(monedas,max,jug):
     jugador1 = "Jugador 1"
     jugador2 = "Jugador 2"
-    if jug[0] != 'M' and jug[0] != 'B': jugador2 = "CPU"
-    elif jug[0] == 'B': jugador1 = "I_A"
+    if jug[0] != 'M' and jug[0] != 'B':
+        if jug[0] == 'C':
+            jugador1 = "CPU"
+            jugador2 = "Jugador 1"
+        else : jugador2 = "CPU"
+    elif jug[0] == 'B':
+        jugador1 = "I_A"
+        jugador2 = "CPU"
 
     jugador_actual = {1:jugador1,0:jugador2}
+    
     if monedas <= 0:
         escribir("Debe haber almenos una moneda para retirar")
         time.sleep(1)
@@ -189,8 +196,6 @@ def juego(monedas,max,jug):
     for a in arbol:
         for b in arbol[a]:
             arbol_valores[(a,b)] = 1 if b in lista_ganar else 0
-    if len(lista_ganar) > 1:
-        del lista_ganar[-1]
 
 
     if jug[0] == 'C': jugador = 0
@@ -202,7 +207,9 @@ def juego(monedas,max,jug):
         canvas.create_text(0,0,anchor = NW,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','20'))
         canvas.create_text(0,50,anchor = NW,text = "Monedas Restantes: "+str(monedas),font = ('Arial','20'))
         canvas.create_text(0,100,anchor = NW,text = "Puedes tomar: "+str(max),font = ('Arial','20'))
-        canvas.create_text(Width/2,50,anchor = NW,text = "Turno: "+str(jugador_actual[jugador]),font = ('Arial','20'))
+        jug_aux = jugador
+        if jug[0] == 'C' : jug_aux = not jugador
+        canvas.create_text(Width/2,50,anchor = NW,text = "Turno: "+str(jugador_actual[jug_aux]),font = ('Arial','20'))
         root.update()
         if jugador:
             eleccion = 0
@@ -245,7 +252,6 @@ def juego(monedas,max,jug):
                     assync_result = pool.apply_async(obtener_entero,(posicion_actual(),))
                     eleccion = assync_result.get()
 
-                    #eleccion = simpledialog.askinteger("Pregunta","jug 2 Cuantas monedas desea retirar?: ",parent = root)
                     if eleccion == None:
                         inicio()
                         salir = False
@@ -263,17 +269,19 @@ def juego(monedas,max,jug):
         canvas.create_text(0,0,anchor = NW,text = "Numeros para ganar"+str(lista_ganar),font = ('Arial','20'))
         canvas.create_text(0,50,anchor = NW,text = "Monedas Restantes: "+str(monedas),font = ('Arial','20'))
         canvas.create_text(0,100,anchor = NW,text = "Puedes tomar: "+str(max),font = ('Arial','20'))
-
-        if jugador : ganador = "El jugador 2"
-        else: ganador = jugador1
+        
+        if jug[0] == 'C' : jugador2,jugador1 = jugador1,jugador2
+        if jugador :
+            ganador = jugador2
+            perdedor = jugador1
+        else: 
+            ganador = jugador1
+            perdedor = jugador2
 
         if monedas == 1:
-            if jugador and jug[0] == 'B' : escribir('Queda solamente una moneda. ha perdido la I_A.')
-            elif jugador and jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha perdido.')
-            elif jug[0] != 'M': escribir('Queda solamente una moneda. Usted ha ganado.')
-            elif jug[0] == 'M': escribir("Queda solamente una moneda. Ha Ganado " + ganador)
+            escribir("Queda solamente una moneda. Ha Ganado " + ganador)
         else:
-            escribir("No han quedado monedas, %s gano" %(ganador))
+            escribir("No han quedado monedas, %s gano" %(perdedor))
         boton = Button(root,text = "Main Screen",width = 12,command = inicio)
         canvas.create_window(Width/2,5*Heigh/6,window = boton)
 inicio()
