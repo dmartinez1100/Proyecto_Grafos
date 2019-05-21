@@ -91,8 +91,8 @@ def inicio():
     canvas.delete("all")
 
     canvas.create_text(Width/2,Heigh/6,anchor = CENTER, text = "Welcome to Nim Game",font = ('Arial','50'))
-    canvas.create_text(Width/2,Heigh/2-50,anchor = CENTER, text = "Max Coins",font = ('Arial','50'))
-    canvas.create_text(Width/2,2*Heigh/3-50,anchor = CENTER, text = "Coins Jump",font = ('Arial','50'))
+    canvas.create_text(Width/2,Heigh/2-50,anchor = CENTER, text = "Initial Coins",font = ('Arial','50'))
+    canvas.create_text(Width/2,2*Heigh/3-50,anchor = CENTER, text = "Max Coins",font = ('Arial','50'))
 
     e1 = Entry(root,textvariable = numero,width = int(Width/10))
     canvas.create_window(Width/2,Heigh/2,anchor = CENTER,window = e1)
@@ -113,6 +113,7 @@ def Nodo(Nombre,x,y,size):
 def Arista(Nombre,x1,y1,x2,y2):
     canvas.create_line(x1,y1,x2,y2)
     canvas.create_window(x2+((x1-x2)/2),y2+((y1-y2)/2),anchor = CENTER,window = Label(root,text = Nombre,bg = "white",fg="red"))
+    canvas.create_oval(x1-5,y1-5,x1+5,y1+5,fill = 'black')
     root.update()
 
 def Arbol(num,altura,num_hijos,nodos,aristas):
